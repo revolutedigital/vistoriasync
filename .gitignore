@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test
+coverage/
+
+# Temp
+tmp/
+temp/
+*.tmp
+
+# Docker
+.docker/
+
+# Prisma
+api/prisma/migrations/*.sql.backup
+
+# Claude
+.claude/
