@@ -5,11 +5,13 @@ import {
   ArrowLeft,
   Upload,
   Calculator,
-  Download,
+  Send,
+  AlertTriangle,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/Badge';
 import { PageLoading } from '@/components/ui/Loading';
 import { formatCurrency, getMonthName, formatDate } from '@/lib/utils';
@@ -21,6 +23,8 @@ export function FechamentoDetailPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<'receber' | 'pagar' | null>(null);
+  const [sending, setSending] = useState(false);
 
   const { data: fechamento, isLoading } = useQuery({
     queryKey: ['fechamento', id],
@@ -93,7 +97,7 @@ export function FechamentoDetailPage() {
       }
 
       if (result.imobiliariasNovas.length > 0) {
-        toast(`${result.imobiliariasNovas.length} novas imobiliárias criadas`, {
+        toast(`${result.imobiliariasNovas.length} novas imobiliarias criadas`, {
           icon: '🏢',
         });
       }
@@ -103,7 +107,7 @@ export function FechamentoDetailPage() {
         });
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error?.message || 'Erro na importação');
+      toast.error(error.response?.data?.error?.message || 'Erro na importacao');
     } finally {
       setImporting(false);
       if (fileInputRef.current) {
@@ -112,27 +116,21 @@ export function FechamentoDetailPage() {
     }
   };
 
-  const handleExport = async (tipo: 'receber' | 'pagar') => {
+  const handleSendToFlow = async (tipo: 'receber' | 'pagar') => {
+    setSending(true);
     try {
-      const response = await api.get(`/api/fechamentos/${id}/exportar/${tipo}`, {
-        responseType: 'blob',
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute(
-        'download',
-        `contas-${tipo}-${fechamento?.mesReferencia}-${fechamento?.anoReferencia}.xlsx`
+      await api.post(`/api/fechamentos/${id}/enviar-flow/${tipo}`);
+      queryClient.invalidateQueries({ queryKey: ['fechamento', id] });
+      toast.success(
+        tipo === 'receber'
+          ? 'Contas a receber enviadas para o Flow!'
+          : 'Contas a pagar enviadas para o Flow!'
       );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      toast.success('Arquivo exportado com sucesso!');
+      setConfirmModal(null);
     } catch (error: any) {
-      toast.error('Erro ao exportar');
+      toast.error(error.response?.data?.error?.message || 'Erro ao enviar para o Flow');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -143,10 +141,26 @@ export function FechamentoDetailPage() {
   if (!fechamento) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Fechamento não encontrado</p>
+        <p className="text-gray-500">Fechamento nao encontrado</p>
       </div>
     );
   }
+
+  const getResumoReceber = () => {
+    if (!resumo?.porImobiliaria) return { quantidade: 0, total: 0 };
+    return {
+      quantidade: resumo.porImobiliaria.reduce((acc: number, item: any) => acc + item._count.id, 0),
+      total: resumo.porImobiliaria.reduce((acc: number, item: any) => acc + (item._sum.valorServico || 0), 0),
+    };
+  };
+
+  const getResumoPagar = () => {
+    if (!resumo?.porVistoriador) return { quantidade: 0, total: 0 };
+    return {
+      quantidade: resumo.porVistoriador.reduce((acc: number, item: any) => acc + item._count.id, 0),
+      total: resumo.porVistoriador.reduce((acc: number, item: any) => acc + (item._sum.valorVistoriador || 0), 0),
+    };
+  };
 
   return (
     <div className="space-y-6">
@@ -190,10 +204,10 @@ export function FechamentoDetailPage() {
         </Card>
       </div>
 
-      {/* Ações */}
+      {/* Acoes */}
       <Card>
         <CardHeader
-          title="Ações do Fechamento"
+          title="Acoes do Fechamento"
           description="Execute as etapas do fechamento mensal"
         />
 
@@ -235,7 +249,7 @@ export function FechamentoDetailPage() {
               </div>
               <div>
                 <p className="font-medium text-gray-900">2. Calcular</p>
-                <p className="text-xs text-gray-500">Valores automáticos</p>
+                <p className="text-xs text-gray-500">Valores automaticos</p>
               </div>
             </div>
             <Button
@@ -249,59 +263,59 @@ export function FechamentoDetailPage() {
             </Button>
           </div>
 
-          {/* Exportar Receber */}
+          {/* Enviar Receber */}
           <div className="p-4 border border-gray-200 rounded-lg">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-green-100 rounded-lg">
-                <Download className="w-5 h-5 text-green-600" />
+                <Send className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">3. Exportar</p>
+                <p className="font-medium text-gray-900">3. Enviar Flow</p>
                 <p className="text-xs text-gray-500">Contas a Receber</p>
               </div>
             </div>
             <Button
               variant="secondary"
               className="w-full"
-              onClick={() => handleExport('receber')}
+              onClick={() => setConfirmModal('receber')}
               disabled={fechamento.status === 'RASCUNHO'}
             >
-              Baixar Excel
+              Enviar para Flow
             </Button>
           </div>
 
-          {/* Exportar Pagar */}
+          {/* Enviar Pagar */}
           <div className="p-4 border border-gray-200 rounded-lg">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-red-100 rounded-lg">
-                <Download className="w-5 h-5 text-red-600" />
+                <Send className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">4. Exportar</p>
+                <p className="font-medium text-gray-900">4. Enviar Flow</p>
                 <p className="text-xs text-gray-500">Contas a Pagar</p>
               </div>
             </div>
             <Button
               variant="secondary"
               className="w-full"
-              onClick={() => handleExport('pagar')}
+              onClick={() => setConfirmModal('pagar')}
               disabled={fechamento.status === 'RASCUNHO'}
             >
-              Baixar Excel
+              Enviar para Flow
             </Button>
           </div>
         </div>
       </Card>
 
-      {/* Resumo por Imobiliária */}
+      {/* Resumo por Imobiliaria */}
       {resumo && resumo.porImobiliaria?.length > 0 && (
         <Card>
-          <CardHeader title="Resumo por Imobiliária" />
+          <CardHeader title="Resumo por Imobiliaria" />
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Imobiliária</th>
+                  <th>Imobiliaria</th>
                   <th className="text-right">Qtd</th>
                   <th className="text-right">Total</th>
                 </tr>
@@ -341,10 +355,10 @@ export function FechamentoDetailPage() {
               <thead>
                 <tr>
                   <th>ID KSI</th>
-                  <th>Imobiliária</th>
+                  <th>Imobiliaria</th>
                   <th>Vistoriador</th>
-                  <th>Endereço</th>
-                  <th className="text-right">Área</th>
+                  <th>Endereco</th>
+                  <th className="text-right">Area</th>
                   <th className="text-right">Valor</th>
                   <th>Status</th>
                 </tr>
@@ -356,7 +370,7 @@ export function FechamentoDetailPage() {
                     <td>{vistoria.imobiliaria?.nome}</td>
                     <td>{vistoria.vistoriador?.nome}</td>
                     <td className="max-w-xs truncate">{vistoria.endereco}</td>
-                    <td className="text-right">{vistoria.areaFaturar} m²</td>
+                    <td className="text-right">{vistoria.areaFaturar} m2</td>
                     <td className="text-right font-medium">
                       {formatCurrency(vistoria.valorServico)}
                     </td>
@@ -370,6 +384,118 @@ export function FechamentoDetailPage() {
           </div>
         </Card>
       )}
+
+      {/* Modal Confirmacao Receber */}
+      <Modal
+        isOpen={confirmModal === 'receber'}
+        onClose={() => setConfirmModal(null)}
+        title="Confirmar Envio - Contas a Receber"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-4 bg-yellow-50 rounded-lg">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-yellow-800">Atencao</p>
+              <p className="text-sm text-yellow-700 mt-1">
+                Voce esta prestes a enviar as contas a receber para o sistema Flow.
+                Esta acao ira criar os lancamentos financeiros automaticamente.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+            <h4 className="font-medium text-gray-900">Resumo do Envio</h4>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Periodo:</span>
+              <span className="font-medium">
+                {getMonthName(fechamento.mesReferencia)}/{fechamento.anoReferencia}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Quantidade de contas:</span>
+              <span className="font-medium">{getResumoReceber().quantidade}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Valor total:</span>
+              <span className="font-medium text-green-600">
+                {formatCurrency(getResumoReceber().total)}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setConfirmModal(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => handleSendToFlow('receber')}
+              loading={sending}
+            >
+              Confirmar Envio
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal Confirmacao Pagar */}
+      <Modal
+        isOpen={confirmModal === 'pagar'}
+        onClose={() => setConfirmModal(null)}
+        title="Confirmar Envio - Contas a Pagar"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-4 bg-yellow-50 rounded-lg">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-yellow-800">Atencao</p>
+              <p className="text-sm text-yellow-700 mt-1">
+                Voce esta prestes a enviar as contas a pagar para o sistema Flow.
+                Esta acao ira criar os lancamentos financeiros para os vistoriadores.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+            <h4 className="font-medium text-gray-900">Resumo do Envio</h4>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Periodo:</span>
+              <span className="font-medium">
+                {getMonthName(fechamento.mesReferencia)}/{fechamento.anoReferencia}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Quantidade de contas:</span>
+              <span className="font-medium">{getResumoPagar().quantidade}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Valor total:</span>
+              <span className="font-medium text-red-600">
+                {formatCurrency(getResumoPagar().total)}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setConfirmModal(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => handleSendToFlow('pagar')}
+              loading={sending}
+            >
+              Confirmar Envio
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
