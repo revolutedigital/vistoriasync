@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import api from '@/lib/api';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { Logo } from '@/components/ui/Logo';
 import toast from 'react-hot-toast';
 
 export function LoginPage() {
@@ -33,12 +34,9 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">VS</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">VistoriaSync</h1>
-          <p className="text-gray-500 mt-2">Sistema de Gestão de Vistorias</p>
+        <div className="flex flex-col items-center mb-8">
+          <Logo size="lg" />
+          <p className="text-gray-500 mt-3">Sistema de Gestão de Vistorias</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">

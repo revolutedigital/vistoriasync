@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
+import { Logo } from '@/components/ui/Logo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -58,11 +59,8 @@ export function Layout({ children }: LayoutProps) {
         )}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">VS</span>
-            </div>
-            <span className="font-semibold text-gray-900">VistoriaSync</span>
+          <Link to="/" className="flex items-center">
+            <Logo size="sm" />
           </Link>
           <button
             className="lg:hidden p-1 text-gray-500 hover:text-gray-700"
