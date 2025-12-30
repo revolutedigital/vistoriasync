@@ -189,14 +189,18 @@ export async function imobiliariasRoutes(app: FastifyInstance) {
         imobiliariaId_tipoServicoId_faixaMetragemId: {
           imobiliariaId: id,
           tipoServicoId: data.tipoServicoId,
-          faixaMetragemId: data.faixaMetragemId ?? null,
+          faixaMetragemId: data.faixaMetragemId ?? '',
         },
       },
       create: {
         imobiliariaId: id,
         ...data,
+        faixaMetragemId: data.faixaMetragemId ?? undefined,
       },
-      update: data,
+      update: {
+        ...data,
+        faixaMetragemId: data.faixaMetragemId ?? undefined,
+      },
       include: {
         tipoServico: true,
         faixaMetragem: true,

@@ -189,14 +189,18 @@ export async function vistoriadoresRoutes(app: FastifyInstance) {
         vistoriadorId_tipoServicoId_faixaMetragemId: {
           vistoriadorId: id,
           tipoServicoId: data.tipoServicoId,
-          faixaMetragemId: data.faixaMetragemId ?? null,
+          faixaMetragemId: data.faixaMetragemId ?? '',
         },
       },
       create: {
         vistoriadorId: id,
         ...data,
+        faixaMetragemId: data.faixaMetragemId ?? undefined,
       },
-      update: data,
+      update: {
+        ...data,
+        faixaMetragemId: data.faixaMetragemId ?? undefined,
+      },
       include: {
         tipoServico: true,
         faixaMetragem: true,

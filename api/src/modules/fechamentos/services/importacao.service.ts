@@ -28,11 +28,11 @@ interface ResultadoImportacao {
 
 export async function importarPlanilhaKSI(
   fechamentoId: string,
-  buffer: Buffer,
+  buffer: Buffer | ArrayBuffer,
   userId: string
 ): Promise<ResultadoImportacao> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  await workbook.xlsx.load(buffer as Buffer);
 
   const worksheet = workbook.worksheets[0];
 
