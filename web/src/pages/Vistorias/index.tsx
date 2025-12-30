@@ -29,7 +29,7 @@ export function VistoriasPage() {
   const { data: fechamentos } = useQuery({
     queryKey: ['fechamentos-select'],
     queryFn: async () => {
-      const response = await api.get('/fechamentos', { params: { limit: 20 } });
+      const response = await api.get('/api/fechamentos', { params: { limit: 20 } });
       return response.data.data as Fechamento[];
     },
   });
@@ -42,7 +42,7 @@ export function VistoriasPage() {
       if (status) params.status = status;
       if (fechamentoId) params.fechamentoId = fechamentoId;
 
-      const response = await api.get('/vistorias', { params });
+      const response = await api.get('/api/vistorias', { params });
       return response.data.data as Vistoria[];
     },
   });

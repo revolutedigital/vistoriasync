@@ -40,7 +40,7 @@ export function ImobiliariasPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['imobiliarias', search],
     queryFn: async () => {
-      const response = await api.get('/imobiliarias', {
+      const response = await api.get('/api/imobiliarias', {
         params: { search, limit: 100 },
       });
       return response.data.data as Imobiliaria[];
@@ -50,9 +50,9 @@ export function ImobiliariasPage() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (editingId) {
-        await api.patch(`/imobiliarias/${editingId}`, form);
+        await api.patch(`/api/imobiliarias/${editingId}`, form);
       } else {
-        await api.post('/imobiliarias', form);
+        await api.post('/api/imobiliarias', form);
       }
     },
     onSuccess: () => {
@@ -67,7 +67,7 @@ export function ImobiliariasPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/imobiliarias/${id}`);
+      await api.delete(`/api/imobiliarias/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['imobiliarias'] });

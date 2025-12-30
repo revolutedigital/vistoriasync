@@ -32,7 +32,7 @@ export function VistoriadoresPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['vistoriadores', search],
     queryFn: async () => {
-      const response = await api.get('/vistoriadores', {
+      const response = await api.get('/api/vistoriadores', {
         params: { search, limit: 100 },
       });
       return response.data.data as Vistoriador[];
@@ -42,9 +42,9 @@ export function VistoriadoresPage() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (editingId) {
-        await api.patch(`/vistoriadores/${editingId}`, form);
+        await api.patch(`/api/vistoriadores/${editingId}`, form);
       } else {
-        await api.post('/vistoriadores', form);
+        await api.post('/api/vistoriadores', form);
       }
     },
     onSuccess: () => {
@@ -59,7 +59,7 @@ export function VistoriadoresPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/vistoriadores/${id}`);
+      await api.delete(`/api/vistoriadores/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vistoriadores'] });

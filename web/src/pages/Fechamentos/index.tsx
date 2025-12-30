@@ -24,14 +24,14 @@ export function FechamentosPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['fechamentos'],
     queryFn: async () => {
-      const response = await api.get('/fechamentos');
+      const response = await api.get('/api/fechamentos');
       return response.data.data as Fechamento[];
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post('/fechamentos', {
+      const response = await api.post('/api/fechamentos', {
         mesReferencia: mes,
         anoReferencia: ano,
       });

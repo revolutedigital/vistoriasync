@@ -25,7 +25,7 @@ export function FechamentoDetailPage() {
   const { data: fechamento, isLoading } = useQuery({
     queryKey: ['fechamento', id],
     queryFn: async () => {
-      const response = await api.get(`/fechamentos/${id}`);
+      const response = await api.get(`/api/fechamentos/${id}`);
       return response.data.data as Fechamento;
     },
   });
@@ -33,7 +33,7 @@ export function FechamentoDetailPage() {
   const { data: vistorias } = useQuery({
     queryKey: ['fechamento-vistorias', id],
     queryFn: async () => {
-      const response = await api.get(`/fechamentos/${id}/vistorias`, {
+      const response = await api.get(`/api/fechamentos/${id}/vistorias`, {
         params: { limit: 10 },
       });
       return response.data.data as Vistoria[];
@@ -44,7 +44,7 @@ export function FechamentoDetailPage() {
   const { data: resumo } = useQuery({
     queryKey: ['fechamento-resumo', id],
     queryFn: async () => {
-      const response = await api.get(`/fechamentos/${id}/resumo`);
+      const response = await api.get(`/api/fechamentos/${id}/resumo`);
       return response.data.data;
     },
     enabled: !!fechamento && fechamento.status !== 'RASCUNHO',
@@ -52,7 +52,7 @@ export function FechamentoDetailPage() {
 
   const calcularMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post(`/fechamentos/${id}/calcular`);
+      const response = await api.post(`/api/fechamentos/${id}/calcular`);
       return response.data.data as CalculoResult;
     },
     onSuccess: (data) => {
@@ -76,7 +76,7 @@ export function FechamentoDetailPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await api.post(`/fechamentos/${id}/importar`, formData, {
+      const response = await api.post(`/api/fechamentos/${id}/importar`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -114,7 +114,7 @@ export function FechamentoDetailPage() {
 
   const handleExport = async (tipo: 'receber' | 'pagar') => {
     try {
-      const response = await api.get(`/fechamentos/${id}/exportar/${tipo}`, {
+      const response = await api.get(`/api/fechamentos/${id}/exportar/${tipo}`, {
         responseType: 'blob',
       });
 

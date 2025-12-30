@@ -19,7 +19,7 @@ export function DashboardPage() {
   const { data: fechamentos, isLoading: loadingFechamentos } = useQuery({
     queryKey: ['fechamentos', { limit: 5 }],
     queryFn: async () => {
-      const response = await api.get('/fechamentos', { params: { limit: 5 } });
+      const response = await api.get('/api/fechamentos', { params: { limit: 5 } });
       return response.data.data as Fechamento[];
     },
   });
@@ -28,8 +28,8 @@ export function DashboardPage() {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const [imobRes, vistRes] = await Promise.all([
-        api.get('/imobiliarias', { params: { limit: 1, ativo: true } }),
-        api.get('/vistoriadores', { params: { limit: 1, ativo: true } }),
+        api.get('/api/imobiliarias', { params: { limit: 1, ativo: true } }),
+        api.get('/api/vistoriadores', { params: { limit: 1, ativo: true } }),
       ]);
       return {
         imobiliarias: imobRes.data.meta.total,

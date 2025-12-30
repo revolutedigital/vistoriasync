@@ -33,7 +33,7 @@ export function ConfiguracoesPage() {
   const { data: tiposServico, isLoading: loadingTipos } = useQuery({
     queryKey: ['tipos-servico'],
     queryFn: async () => {
-      const response = await api.get('/tipos-servico');
+      const response = await api.get('/api/tipos-servico');
       return response.data.data as TipoServico[];
     },
   });
@@ -41,7 +41,7 @@ export function ConfiguracoesPage() {
   const { data: faixas, isLoading: loadingFaixas } = useQuery({
     queryKey: ['faixas-metragem'],
     queryFn: async () => {
-      const response = await api.get('/faixas-metragem');
+      const response = await api.get('/api/faixas-metragem');
       return response.data.data as FaixaMetragem[];
     },
   });
@@ -50,9 +50,9 @@ export function ConfiguracoesPage() {
   const saveTipoMutation = useMutation({
     mutationFn: async () => {
       if (editingTipo) {
-        await api.patch(`/tipos-servico/${editingTipo.id}`, tipoForm);
+        await api.patch(`/api/tipos-servico/${editingTipo.id}`, tipoForm);
       } else {
-        await api.post('/tipos-servico', tipoForm);
+        await api.post('/api/tipos-servico', tipoForm);
       }
     },
     onSuccess: () => {
@@ -68,7 +68,7 @@ export function ConfiguracoesPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _deleteTipoMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/tipos-servico/${id}`);
+      await api.delete(`/api/tipos-servico/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-servico'] });
@@ -80,9 +80,9 @@ export function ConfiguracoesPage() {
   const saveFaixaMutation = useMutation({
     mutationFn: async () => {
       if (editingFaixa) {
-        await api.patch(`/faixas-metragem/${editingFaixa.id}`, faixaForm);
+        await api.patch(`/api/faixas-metragem/${editingFaixa.id}`, faixaForm);
       } else {
-        await api.post('/faixas-metragem', faixaForm);
+        await api.post('/api/faixas-metragem', faixaForm);
       }
     },
     onSuccess: () => {
@@ -97,7 +97,7 @@ export function ConfiguracoesPage() {
 
   const deleteFaixaMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/faixas-metragem/${id}`);
+      await api.delete(`/api/faixas-metragem/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['faixas-metragem'] });
