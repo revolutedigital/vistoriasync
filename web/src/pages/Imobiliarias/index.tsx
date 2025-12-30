@@ -32,7 +32,7 @@ export function ImobiliariasPage() {
     whatsapp: '',
     cidade: '',
     diaPagamento: 12,
-    formaPagamento: 'BOLETO' as const,
+    formaPagamento: 'BOLETO' as 'BOLETO' | 'PIX' | 'TRANSFERENCIA',
   });
 
   const queryClient = useQueryClient();

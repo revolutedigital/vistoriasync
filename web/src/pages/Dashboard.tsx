@@ -6,7 +6,6 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
-  AlertCircle,
   ArrowRight,
 } from 'lucide-react';
 import api from '@/lib/api';

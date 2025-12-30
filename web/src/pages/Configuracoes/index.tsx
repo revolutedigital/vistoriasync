@@ -65,7 +65,7 @@ export function ConfiguracoesPage() {
     },
   });
 
-  const deleteTipoMutation = useMutation({
+  const _deleteTipoMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/tipos-servico/${id}`);
     },
