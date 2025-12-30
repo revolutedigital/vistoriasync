@@ -6,9 +6,6 @@ import {
   Upload,
   Calculator,
   Download,
-  CheckCircle,
-  AlertTriangle,
-  FileSpreadsheet,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Card, CardHeader } from '@/components/ui/Card';

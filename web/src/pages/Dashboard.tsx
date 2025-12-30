@@ -13,7 +13,7 @@ import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/ui/Badge';
 import { PageLoading } from '@/components/ui/Loading';
 import { formatCurrency, getMonthName } from '@/lib/utils';
-import type { Fechamento, Imobiliaria, Vistoriador } from '@/types';
+import type { Fechamento } from '@/types';
 
 export function DashboardPage() {
   const { data: fechamentos, isLoading: loadingFechamentos } = useQuery({

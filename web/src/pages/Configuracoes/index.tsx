@@ -65,6 +65,7 @@ export function ConfiguracoesPage() {
     },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _deleteTipoMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/tipos-servico/${id}`);
