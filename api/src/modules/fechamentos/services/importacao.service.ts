@@ -32,7 +32,8 @@ export async function importarPlanilhaKSI(
   userId: string
 ): Promise<ResultadoImportacao> {
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer as Buffer);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await workbook.xlsx.load(buffer as any);
 
   const worksheet = workbook.worksheets[0];
 
